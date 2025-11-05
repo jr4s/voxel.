@@ -1,17 +1,25 @@
 import java.awt.event.*;
 
-/**
- * Handles mouse + keyboard + wheel input and delegates actions to SimCanvas.
- */
 public class InputHandler implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
     private final SimCanvas canvas;
     private boolean mouseDown = false;
 
-    public InputHandler(SimCanvas canvas) 
+    private InputHandler(SimCanvas canvas) 
     {
         this.canvas = canvas;
 
-        // Register listeners on the canvas
+    }
+
+    public static InputHandler createAndRegister(SimCanvas canvas)
+    {
+        InputHandler handler = new InputHandler(canvas);
+        handler.registerListener();
+        return handler;
+    }
+
+    private void registerListener()
+    {
+        // register listeners on the canvas to prevent 'this' leaks
         canvas.addMouseListener(this); canvas.addMouseMotionListener(this); canvas.addMouseWheelListener(this);
 
         canvas.addKeyListener(this); canvas.setFocusable(true); canvas.requestFocusInWindow();
@@ -34,7 +42,7 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
                 canvas.currentElement = new Elements.Empty(); // eraser
                 break;
             case KeyEvent.VK_C:
-                // Clear whole grid
+                // clear canvas
                 if (canvas.grid != null) {
                     for (int y = 0; y < canvas.GRID_ROWS; y++) 
                     {
@@ -47,7 +55,7 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
                 canvas.repaint();
                 break;
             default:
-                // ignore other keys
+                // invalid inputs
                 break;
         }
     }
