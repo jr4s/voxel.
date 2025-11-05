@@ -3,6 +3,41 @@ import java.util.Random;
 
 public class Elements 
 {
+
+    /* Stone */ 
+    public static class Stone extends Element {
+        public enum StoneColor {
+            BASALT(new Color(110, 110, 110)),
+            GRANITE(new Color(130, 125, 120)),
+            LIMESTONE(new Color(150, 145, 135)),
+            SANDSTONE(new Color(170, 165, 150)),
+            MARBLE(new Color(190, 185, 170));
+
+            public final Color value;
+
+            StoneColor(Color value) {
+                this.value = value;
+            }
+
+            public static Color random() {
+                StoneColor[] values = StoneColor.values();
+                return values[(int)(Math.random() * values.length)].value;
+            }
+        }
+
+    private final Color color;
+
+    public Stone() {
+        this.color = StoneColor.random();
+    }
+
+    @Override
+    public Color getColor() {
+        return color;
+    }
+}
+
+
     public static abstract class Element 
     {
         public abstract Color getColor();
@@ -22,11 +57,32 @@ public class Elements
         public boolean isEmpty() { return true; }       // Stay empty
     }
 
-    /* Sand */
+    /* Sand properties and behaviour */
     public static class Sand extends Element 
     {
-        @Override
-        public Color getColor() { return new Color(253, 253, 150); }
+
+    private static final Color[] COLORS = {
+        new Color(220, 180, 60),   
+        new Color(230, 190, 80),   
+        new Color(240, 205, 100),  
+        new Color(245, 220, 130),  
+        new Color(250, 235, 160)   
+    };
+
+
+    private final Color color;
+
+    public Sand() 
+    {
+        int index = (int)(Math.random() * COLORS.length);
+        this.color = COLORS[index];
+    }
+
+    @Override
+    public Color getColor() 
+    {
+        return color;
+    }
 
         @Override
         public void update(int y, int x, Element[][] grid, Random rand) 
@@ -34,7 +90,6 @@ public class Elements
             int rows = grid.length;
             int cols = grid[0].length;
 
-            // fall straight down
             if (y + 1 < rows && (grid[y + 1][x] instanceof Empty || grid[y + 1][x] instanceof Water)) 
             {
                 move(grid, y, x, y + 1, x);
@@ -43,22 +98,20 @@ public class Elements
 
             int dir = rand.nextBoolean() ? -1 : 1;
 
-            /* if and else if slides diagonaly */
             if (y + 1 < rows && x + dir >= 0 && x + dir < cols &&
-
                 (grid[y + 1][x + dir] instanceof Empty || grid[y + 1][x + dir] instanceof Water) &&
                 grid[y][x + dir] instanceof Empty) {
                 move(grid, y, x, y + 1, x + dir);
 
             } else if (y + 1 < rows && x - dir >= 0 && x - dir < cols &&
-                       (grid[y + 1][x - dir] instanceof Empty || grid[y + 1][x - dir] instanceof Water) &&
-                       grid[y][x - dir] instanceof Empty) {
+                    (grid[y + 1][x - dir] instanceof Empty || grid[y + 1][x - dir] instanceof Water) &&
+                    grid[y][x - dir] instanceof Empty) {
                 move(grid, y, x, y + 1, x - dir);
             }
         }
     }
 
-    /* Water */
+    /* Water properties and behaviours */
     public static class Water extends Element 
     {
         @Override
@@ -96,16 +149,11 @@ public class Elements
             }
         }
     }
-
-    /* Stone */ 
-    public static class Stone extends Element 
-    {
-        @Override
-        public Color getColor() { return new Color(120, 120, 120); }
-    }
-
-    static void move(Element[][] grid, int fromY, int fromX, int toY, int toX) {
+        static void move(Element[][] grid, int fromY, int fromX, int toY, int toX) {
         grid[toY][toX] = grid[fromY][fromX];
         grid[fromY][fromX] = new Elements.Empty();
     }
 }
+
+
+
