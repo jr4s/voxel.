@@ -7,12 +7,12 @@ public class SimCanvas extends JPanel implements ActionListener
 {
     static final int PIXEL_SIZE = 4;
 
-    // Public for InputHandler
+    // for InputHandler
     public int GRID_COLS, GRID_ROWS;
     public Elements.Element[][] grid;
 
     Timer timer;
-    InputHandler input;
+    // inputHandler input;
     public int brushSize = 1;
     public Elements.Element currentElement = new Elements.Sand();
 
@@ -34,7 +34,7 @@ public class SimCanvas extends JPanel implements ActionListener
     {
         resizeGrid();
 
-        input = new InputHandler(this);
+        InputHandler.createAndRegister(this);
 
         // Update the grid depending on windows size
         addComponentListener(new ComponentAdapter() 
@@ -136,7 +136,7 @@ public class SimCanvas extends JPanel implements ActionListener
             {
                 int x = cx + dx;
                 int y = cy + dy;
-                
+
                 if (x >= 0 && x < GRID_COLS && y >= 0 && y < GRID_ROWS) {
                     try {
                         if (currentElement != null) {
@@ -144,9 +144,9 @@ public class SimCanvas extends JPanel implements ActionListener
                         } else {
                             grid[y][x] = new Elements.Sand();
                         }
-                    } catch (Exception ex) {
+                    // exception handling
+                    } catch (ReflectiveOperationException ex) {
                         grid[y][x] = new Elements.Sand();
-                        ex.printStackTrace();
                     }
                 }
             }
