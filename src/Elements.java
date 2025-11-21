@@ -90,19 +90,22 @@ public class Elements
             int rows = grid.length;
             int cols = grid[0].length;
 
+            // if space below is empty or water, move down
             if (y + 1 < rows && (grid[y + 1][x] instanceof Empty || grid[y + 1][x] instanceof Water)) 
             {
                 move(grid, y, x, y + 1, x);
                 return;
             }
 
-            int dir = rand.nextBoolean() ? -1 : 1;
+            int dir = rand.nextBoolean() ? -1 : 1; // pick left or right randomly
 
+            // try to move diagonally down in chosen direction
             if (y + 1 < rows && x + dir >= 0 && x + dir < cols &&
                 (grid[y + 1][x + dir] instanceof Empty || grid[y + 1][x + dir] instanceof Water) &&
                 grid[y][x + dir] instanceof Empty) {
                 move(grid, y, x, y + 1, x + dir);
 
+            // if first diagonal is blocked, try the opposite direction
             } else if (y + 1 < rows && x - dir >= 0 && x - dir < cols &&
                     (grid[y + 1][x - dir] instanceof Empty || grid[y + 1][x - dir] instanceof Water) &&
                     grid[y][x - dir] instanceof Empty) {
