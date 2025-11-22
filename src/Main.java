@@ -1,10 +1,14 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
-public class Main 
-{
-    public static void main(String[] args) 
-    {
-        JFrame frame = new JFrame("OpenJDK");
+public class Main {
+    private static boolean isFullscreen = false;
+    private static GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+    private static JFrame frame;
+
+    public static void main(String[] args) {
+        frame = new JFrame("PX-JAVAC");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(true);
 
@@ -15,5 +19,29 @@ public class Main
         frame.setVisible(true);
 
         canvas.gameInit();
+
+        // Add key binding for F11
+        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"), "toggleFullscreen");
+        canvas.getActionMap().put("toggleFullscreen", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleFullscreen();
+            }
+        });
+    }
+
+    private static void toggleFullscreen() {
+        if (!isFullscreen) {
+            frame.dispose(); // required before undecorated change
+            frame.setUndecorated(true);
+            gd.setFullScreenWindow(frame);
+            isFullscreen = true;
+        } else {
+            gd.setFullScreenWindow(null);
+            frame.dispose();
+            frame.setUndecorated(false);
+            frame.setVisible(true);
+            isFullscreen = false;
+        }
     }
 }
