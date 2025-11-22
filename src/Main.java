@@ -12,6 +12,9 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(true);
 
+        ImageIcon ico = new ImageIcon("res/assets/icon.png");
+        frame.setIconImage(ico.getImage());
+        
         SimCanvas canvas = new SimCanvas();
         frame.add(canvas);
         frame.pack();
