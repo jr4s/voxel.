@@ -29,3 +29,6 @@ Thumbs.db
 
 # Backup files
 *~
+
+# Custom files
+cmd.txt
