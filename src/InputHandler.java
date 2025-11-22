@@ -2,12 +2,10 @@ import java.awt.event.*;
 
 public class InputHandler implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
     private final SimCanvas canvas;
-    private boolean mouseDown = false;
 
     private InputHandler(SimCanvas canvas) 
     {
         this.canvas = canvas;
-
     }
 
     public static InputHandler createAndRegister(SimCanvas canvas)
@@ -19,10 +17,13 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
 
     private void registerListener()
     {
-        // register listeners on the canvas to prevent 'this' leaks
-        canvas.addMouseListener(this); canvas.addMouseMotionListener(this); canvas.addMouseWheelListener(this);
+        canvas.addMouseListener(this);
+        canvas.addMouseMotionListener(this);
+        canvas.addMouseWheelListener(this);
 
-        canvas.addKeyListener(this); canvas.setFocusable(true); canvas.requestFocusInWindow();
+        canvas.addKeyListener(this);
+        canvas.setFocusable(true);
+        canvas.requestFocusInWindow();
     }
 
     @Override
@@ -42,12 +43,9 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
                 canvas.currentElement = new Elements.Empty(); // eraser
                 break;
             case KeyEvent.VK_C:
-                // clear canvas
                 if (canvas.grid != null) {
-                    for (int y = 0; y < canvas.GRID_ROWS; y++) 
-                    {
-                        for (int x = 0; x < canvas.GRID_COLS; x++) 
-                        {
+                    for (int y = 0; y < canvas.GRID_ROWS; y++) {
+                        for (int x = 0; x < canvas.GRID_COLS; x++) {
                             canvas.grid[y][x] = new Elements.Empty();
                         }
                     }
@@ -55,7 +53,6 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
                 canvas.repaint();
                 break;
             default:
-                // invalid inputs
                 break;
         }
     }
@@ -63,20 +60,20 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
     @Override
     public void mousePressed(MouseEvent e) 
     {
-        mouseDown = true;
-        canvas.dropElement(e);
+        canvas.mouseDown = true; // let SimCanvas handle pouring dynamically
     }
 
     @Override
     public void mouseReleased(MouseEvent e) 
     {
-        mouseDown = false;
+        canvas.mouseDown = false;
     }
 
     @Override
     public void mouseDragged(MouseEvent e)
     {
-        if (mouseDown) canvas.dropElement(e);
+        // no need to call dropElement here; SimCanvas handles pouring each frame
+        canvas.repaint();
     }
 
     @Override

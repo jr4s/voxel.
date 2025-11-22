@@ -3,44 +3,55 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
 
-public class SimCanvas extends JPanel implements ActionListener 
+public class SimCanvas extends JPanel implements ActionListener
 {
     static final int PIXEL_SIZE = 4;
 
-    // for InputHandler
     public int GRID_COLS, GRID_ROWS;
     public Elements.Element[][] grid;
 
     Timer timer;
-    // inputHandler input;
     public int brushSize = 1;
     public Elements.Element currentElement = new Elements.Sand();
 
     private final Random rand = new Random();
+    public boolean mouseDown = false;
 
-    public SimCanvas() 
+    public SimCanvas()
     {
         setBackground(Color.BLACK);
         setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
 
-        /* Hide the system cursor inside the canvas */ 
         Toolkit tool = Toolkit.getDefaultToolkit();
         Image blankCursor = tool.createImage(new byte[0]);
         Cursor invisibleCursor = tool.createCustomCursor(blankCursor, new Point(0, 0), "invisibleCursor");
         setCursor(invisibleCursor);
-    }
 
-    public void gameInit() 
-    {
-        resizeGrid();
-
-        InputHandler.createAndRegister(this);
-
-        // Update the grid depending on windows size
-        addComponentListener(new ComponentAdapter() 
+        addMouseListener(new MouseAdapter()
         {
             @Override
-            public void componentResized(ComponentEvent e) 
+            public void mousePressed(MouseEvent e)
+            {
+                mouseDown = true;
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e)
+            {
+                mouseDown = false;
+            }
+        });
+    }
+
+    public void gameInit()
+    {
+        resizeGrid();
+        InputHandler.createAndRegister(this);
+
+        addComponentListener(new ComponentAdapter()
+        {
+            @Override
+            public void componentResized(ComponentEvent e)
             {
                 resizeGrid();
             }
@@ -50,19 +61,23 @@ public class SimCanvas extends JPanel implements ActionListener
         timer.start();
     }
 
-    void resizeGrid() 
+    void resizeGrid()
     {
         int newCols = Math.max(1, getWidth() / PIXEL_SIZE);
         int newRows = Math.max(1, getHeight() / PIXEL_SIZE);
 
         Elements.Element[][] newGrid = new Elements.Element[newRows][newCols];
 
-        for (int y = 0; y < newRows; y++) {
-            for (int x = 0; x < newCols; x++) {
-                if (grid != null && y < grid.length && x < grid[0].length) {
+        for (int y = 0; y < newRows; y++)
+        {
+            for (int x = 0; x < newCols; x++)
+            {
+                if (grid != null && y < grid.length && x < grid[0].length)
+                {
                     newGrid[y][x] = grid[y][x];
-
-                } else {
+                }
+                else
+                {
                     newGrid[y][x] = new Elements.Empty();
                 }
             }
@@ -74,18 +89,30 @@ public class SimCanvas extends JPanel implements ActionListener
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) 
+    public void actionPerformed(ActionEvent e)
     {
         if (grid == null) return;
+
+        if (mouseDown)
+        {
+            Point p = getMousePosition();
+            if (p != null)
+            {
+                int cx = p.x / PIXEL_SIZE;
+                int cy = p.y / PIXEL_SIZE;
+                dropElementAt(cx, cy);
+            }
+        }
+
         updateGrid();
         repaint();
     }
 
-    public void updateGrid() 
+    public void updateGrid()
     {
-        for (int y = GRID_ROWS - 2; y >= 0; y--) 
+        for (int y = GRID_ROWS - 2; y >= 0; y--)
         {
-            for (int x = 1; x < GRID_COLS - 1; x++) 
+            for (int x = 1; x < GRID_COLS - 1; x++)
             {
                 grid[y][x].update(y, x, grid, rand);
             }
@@ -93,61 +120,56 @@ public class SimCanvas extends JPanel implements ActionListener
     }
 
     @Override
-    protected void paintComponent(Graphics g) 
+    protected void paintComponent(Graphics g)
     {
         super.paintComponent(g);
         if (grid == null) return;
 
-        for (int y = 0; y < GRID_ROWS; y++) 
+        for (int y = 0; y < GRID_ROWS; y++)
         {
-            for (int x = 0; x < GRID_COLS; x++) 
+            for (int x = 0; x < GRID_COLS; x++)
             {
                 g.setColor(grid[y][x].getColor());
                 g.fillRect(x * PIXEL_SIZE, y * PIXEL_SIZE, PIXEL_SIZE, PIXEL_SIZE);
             }
         }
 
-        // cursor outline
+        // minimal cursor dot
         Point p = getMousePosition();
-        if (p != null) {
+        if (p != null)
+        {
             int cx = p.x / PIXEL_SIZE;
             int cy = p.y / PIXEL_SIZE;
-            g.setColor(currentElement != null ? currentElement.getColor() : Color.WHITE);
-            g.drawRect(
-                (cx - brushSize / 2) * PIXEL_SIZE,
-                (cy - brushSize / 2) * PIXEL_SIZE,
-                brushSize * PIXEL_SIZE,
-                brushSize * PIXEL_SIZE
+            g.setColor(Color.WHITE);
+            int half = brushSize * PIXEL_SIZE / 2;
+            g.drawLine(
+            (cx * PIXEL_SIZE) - half,
+            cy * PIXEL_SIZE,
+            (cx * PIXEL_SIZE) + half,
+            cy * PIXEL_SIZE
             );
         }
     }
 
-    /** Drops the currently selected element at mouse location using brushSize. */
-    public void dropElement(MouseEvent e) 
+    public void dropElementAt(int cx, int cy)
     {
-        if (grid == null) return;
+        int half = brushSize / 2;
+        int baseY = cy + 1; // drop just below the cursor line
 
-        int cx = e.getX() / PIXEL_SIZE;
-        int cy = e.getY() / PIXEL_SIZE;
-
-        for (int dy = -brushSize / 2; dy <= brushSize / 2; dy++) 
+        for (int dx = -half; dx <= half; dx++)
         {
-            for (int dx = -brushSize / 2; dx <= brushSize / 2; dx++)
-            {
-                int x = cx + dx;
-                int y = cy + dy;
+            int x = cx + dx;
 
-                if (x >= 0 && x < GRID_COLS && y >= 0 && y < GRID_ROWS) {
-                    try {
-                        if (currentElement != null) {
-                            grid[y][x] = currentElement.getClass().getDeclaredConstructor().newInstance();
-                        } else {
-                            grid[y][x] = new Elements.Sand();
-                        }
-                    // exception handling
-                    } catch (ReflectiveOperationException ex) {
-                        grid[y][x] = new Elements.Sand();
-                    }
+            // optional wiggle effect
+            int wiggle = (int)(Math.sin(System.currentTimeMillis() * 0.01 + dx * 0.5) * 1.5);
+            int y = baseY + wiggle;
+
+            if (x >= 0 && x < GRID_COLS && y >= 0 && y < GRID_ROWS)
+            {
+                try {
+                    grid[y][x] = currentElement.getClass().getDeclaredConstructor().newInstance();
+                } catch (ReflectiveOperationException ex) {
+                    grid[y][x] = new Elements.Sand();
                 }
             }
         }
