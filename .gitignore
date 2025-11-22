@@ -1,22 +1,31 @@
-# Compiled class files in bin
-bin/**/*.class
+# Maven output
+/target/
 
-# Logs
-*.log
-
-# Editor
+# VS Code settings
 .vscode/
-.idea/
-*.iml
-*.ipr
-*.iws
 
-# OS files
+# OS-specific
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# Backup / temp 
-*.bak
+# Logs and temp files
+*.log
 *.tmp
-~$*
+
+# Compiled class files (if ever outside target)
+/bin/
+/*.class
+
+# IDE-specific
+*.iml
+.idea/
+*.swp
+
+# Java-specific
+*.class
+*.jar
+*.war
+*.ear
+
+# Backup files
+*~
