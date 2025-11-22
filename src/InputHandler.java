@@ -40,7 +40,10 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
                 canvas.currentElement = new Elements.Stone();
                 break;
             case KeyEvent.VK_4:
-                canvas.currentElement = new Elements.Empty(); // eraser
+                canvas.currentElement = new Elements.Dirt();
+                break;
+            case KeyEvent.VK_5:
+                canvas.currentElement = new Elements.Empty();
                 break;
             case KeyEvent.VK_C:
                 if (canvas.grid != null) {
@@ -60,7 +63,7 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
     @Override
     public void mousePressed(MouseEvent e) 
     {
-        canvas.mouseDown = true; // let SimCanvas handle pouring dynamically
+        canvas.mouseDown = true; 
     }
 
     @Override
@@ -72,7 +75,6 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
     @Override
     public void mouseDragged(MouseEvent e)
     {
-        // no need to call dropElement here; SimCanvas handles pouring each frame
         canvas.repaint();
     }
 

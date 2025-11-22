@@ -11,6 +11,8 @@ public class SimCanvas extends JPanel implements ActionListener
     public Elements.Element[][] grid;
 
     Timer timer;
+    Font gameFont;
+
     public int brushSize = 1;
     public Elements.Element currentElement = new Elements.Sand();
 
@@ -21,6 +23,8 @@ public class SimCanvas extends JPanel implements ActionListener
     {
         setBackground(Color.BLACK);
         setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
+
+        gameFont = FontManager.load("res/fonts/ByteBounce.ttf", 25);
 
         Toolkit tool = Toolkit.getDefaultToolkit();
         Image blankCursor = tool.createImage(new byte[0]);
@@ -125,6 +129,7 @@ public class SimCanvas extends JPanel implements ActionListener
         super.paintComponent(g);
         if (grid == null) return;
 
+        // Draw grid
         for (int y = 0; y < GRID_ROWS; y++)
         {
             for (int x = 0; x < GRID_COLS; x++)
@@ -134,33 +139,55 @@ public class SimCanvas extends JPanel implements ActionListener
             }
         }
 
-        // minimal cursor dot
+        // Cursor + HUD
         Point p = getMousePosition();
         if (p != null)
         {
             int cx = p.x / PIXEL_SIZE;
             int cy = p.y / PIXEL_SIZE;
+
             g.setColor(Color.WHITE);
             int half = brushSize * PIXEL_SIZE / 2;
+
             g.drawLine(
-            (cx * PIXEL_SIZE) - half,
-            cy * PIXEL_SIZE,
-            (cx * PIXEL_SIZE) + half,
-            cy * PIXEL_SIZE
+                (cx * PIXEL_SIZE) - half,
+                cy * PIXEL_SIZE,
+                (cx * PIXEL_SIZE) + half,
+                cy * PIXEL_SIZE
             );
+
+            g.setFont(gameFont);
+            g.setColor(Color.WHITE);
+
+            String label = String.format(
+                "x%d, y%d   Pxls:%d   Brush:%d",
+                cx, cy,
+                countDrawnPixels(),  
+                brushSize
+            );
+
+            g.drawString(label, 20, 60);
+        }
+
+        // Current element label
+        if (gameFont != null)
+        {
+            g.setFont(gameFont);
+            g.setColor(Color.WHITE);
+            g.drawString("Elem: " + currentElement.getClass().getSimpleName(), 20, 40);
+            g.drawString("Temp: ", 180, 40);
         }
     }
 
     public void dropElementAt(int cx, int cy)
     {
         int half = brushSize / 2;
-        int baseY = cy + 1; // drop just below the cursor line
+        int baseY = cy + 1;
 
         for (int dx = -half; dx <= half; dx++)
         {
             int x = cx + dx;
 
-            // optional wiggle effect
             int wiggle = (int)(Math.sin(System.currentTimeMillis() * 0.01 + dx * 0.5) * 1.5);
             int y = baseY + wiggle;
 
@@ -173,5 +200,43 @@ public class SimCanvas extends JPanel implements ActionListener
                 }
             }
         }
+    }
+
+    public int countPixelsAt(int cx, int cy)
+    {
+        int count = 0;
+        int half = brushSize / 2;
+
+        for (int dx = -half; dx <= half; dx++)
+        {
+            int x = cx + dx;
+            int y = cy;
+
+            if (x >= 0 && x < GRID_COLS && y >= 0 && y < GRID_ROWS)
+            {
+                if (!(grid[y][x] instanceof Elements.Empty))
+                {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    private int countDrawnPixels()
+    {
+        int count = 0;
+        for (int y = 0; y < GRID_ROWS; y++)
+        {
+            for (int x = 0; x < GRID_COLS; x++)
+            {
+                if (!(grid[y][x] instanceof Elements.Empty))
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }

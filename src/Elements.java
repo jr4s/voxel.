@@ -3,19 +3,13 @@ import java.util.Random;
 
 public class Elements
 {
-
     public static abstract class Element
     {
         public abstract Color getColor();
 
-        public void update(int y, int x, Elements.Element[][] grid, Random rand)
-        {
-        }
+        public void update(int y, int x, Elements.Element[][] grid, Random rand) { }
 
-        public boolean isEmpty()
-        {
-            return false;
-        }
+        public boolean isEmpty() { return false; }
     }
 
     public static class Stone extends Element
@@ -30,10 +24,7 @@ public class Elements
 
             public final Color value;
 
-            StoneColor(Color value)
-            {
-                this.value = value;
-            }
+            StoneColor(Color value) { this.value = value; }
 
             public static Color random()
             {
@@ -44,31 +35,19 @@ public class Elements
 
         private final Color color;
 
-        public Stone()
-        {
-            this.color = StoneColor.random();
-        }
+        public Stone() { this.color = StoneColor.random(); }
 
         @Override
-        public Color getColor()
-        {
-            return color;
-        }
+        public Color getColor() { return color; }
     }
 
     public static class Empty extends Element
     {
         @Override
-        public Color getColor()
-        {
-            return Color.BLACK;
-        }
+        public Color getColor() { return Color.BLACK; }
 
         @Override
-        public boolean isEmpty()
-        {
-            return true;
-        }
+        public boolean isEmpty() { return true; }
     }
 
     public static class Sand extends Element
@@ -100,11 +79,9 @@ public class Elements
             int rows = grid.length;
             int cols = grid[0].length;
 
-            // Try straight down first
             if (y + 1 < rows)
             {
                 Element below = grid[y + 1][x];
-
                 if (below instanceof Empty || below instanceof Water)
                 {
                     move(grid, y, x, y + 1, x);
@@ -112,7 +89,62 @@ public class Elements
                 }
             }
 
-            // Randomly choose left or right
+            if (rand.nextBoolean() || rand.nextInt(3) == 0) 
+            {
+                int dir = rand.nextBoolean() ? -1 : 1;
+                int nx = x + dir;
+                int ny = y + 1;
+
+                if (nx >= 0 && nx < cols && ny < rows)
+                {
+                    Element diag = grid[ny][nx];
+                    if (diag instanceof Empty || diag instanceof Water)
+                    {
+                        move(grid, y, x, ny, nx);
+                    }
+                }
+            }
+        }
+    }
+
+    public static class Dirt extends Element
+    {
+        private static final Color[] COLORS =
+        {
+            new Color(150, 100, 60),
+            new Color(135, 85, 50),
+            new Color(120, 70, 40)
+        };
+
+        private final Color color;
+
+        public Dirt()
+        {
+            int index = (int)(Math.random() * COLORS.length);
+            this.color = COLORS[index];
+        }
+
+        @Override
+        public Color getColor() { return color; }
+
+        @Override
+        public void update(int y, int x, Element[][] grid, Random rand)
+        {
+            int rows = grid.length;
+            int cols = grid[0].length;
+
+            // Try straight down first
+            if (y + 1 < rows)
+            {
+                Element below = grid[y + 1][x];
+                if (below instanceof Empty)
+                {
+                    move(grid, y, x, y + 1, x);
+                    return;
+                }
+            }
+
+            // Try one random diagonal direction (less slidey than sand)
             int dir = rand.nextBoolean() ? -1 : 1;
             int nx = x + dir;
             int ny = y + 1;
@@ -120,23 +152,7 @@ public class Elements
             if (nx >= 0 && nx < cols && ny < rows)
             {
                 Element diag = grid[ny][nx];
-
-                if (diag instanceof Empty || diag instanceof Water)
-                {
-                    move(grid, y, x, ny, nx);
-                    return;
-                }
-            }
-
-            // Try the opposite direction if first fails
-            nx = x - dir;
-            ny = y + 1;
-
-            if (nx >= 0 && nx < cols && ny < rows)
-            {
-                Element diag = grid[ny][nx];
-
-                if (diag instanceof Empty || diag instanceof Water)
+                if (diag instanceof Empty)
                 {
                     move(grid, y, x, ny, nx);
                 }
@@ -153,10 +169,7 @@ public class Elements
 
             public final Color value;
 
-            WaterColor(Color value)
-            {
-                this.value = value;
-            }
+            WaterColor(Color value) { this.value = value; }
 
             public static Color random()
             {
@@ -167,16 +180,10 @@ public class Elements
 
         private final Color color;
 
-        public Water()
-        {
-            this.color = WaterColor.random();
-        }
+        public Water() { this.color = WaterColor.random(); }
 
         @Override
-        public Color getColor()
-        {
-            return color;
-        }
+        public Color getColor() { return color; }
 
         @Override
         public void update(int y, int x, Element[][] grid, Random rand)
@@ -192,10 +199,7 @@ public class Elements
 
             int dir = rand.nextBoolean() ? -1 : 1;
 
-            if (rand.nextInt(4) == 0)
-            {
-                return;
-            }
+            if (rand.nextInt(4) == 0) return;
 
             if (y + 1 < rows && x + dir >= 0 && x + dir < cols &&
                 grid[y + 1][x + dir] instanceof Empty)
@@ -225,6 +229,4 @@ public class Elements
         grid[toY][toX] = grid[fromY][fromX];
         grid[fromY][fromX] = new Elements.Empty();
     }
-
-
 }
