@@ -4,18 +4,18 @@ import java.awt.event.*;
 
 public class Main {
     private static boolean isFullscreen = false;
-    private static GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+    private static final GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     private static JFrame frame;
 
     public static void main(String[] args) {
-        frame = new JFrame("PX-JAVAC");
+        frame = new JFrame("JVoxels - OpenJDK");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(true);
 
         ImageIcon ico = new ImageIcon("res/assets/icon.png");
         frame.setIconImage(ico.getImage());
         
-        SimCanvas canvas = new SimCanvas();
+        Renderer canvas = new Renderer();
         frame.add(canvas);
         frame.pack();
         frame.setLocationRelativeTo(null);

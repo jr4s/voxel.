@@ -1,14 +1,14 @@
 import java.awt.event.*;
 
 public class InputHandler implements MouseListener, MouseMotionListener, MouseWheelListener, KeyListener {
-    private final SimCanvas canvas;
+    private final Renderer canvas;
 
-    private InputHandler(SimCanvas canvas) 
+    private InputHandler(Renderer canvas) 
     {
         this.canvas = canvas;
     }
 
-    public static InputHandler createAndRegister(SimCanvas canvas)
+    public static InputHandler createAndRegister(Renderer canvas)
     {
         InputHandler handler = new InputHandler(canvas);
         handler.registerListener();
@@ -29,6 +29,29 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
     @Override
     public void keyPressed(KeyEvent e) 
     {
+        // boolean ctrl = (e.isControlDown());
+
+        /* 
+        if(ctrl && e.getKeyCode() == KeyEvent.VK_EQUALS) {
+            if(canvas.PIXEL_SIZE < 50)
+            canvas.PIXEL_SIZE++;
+                canvas.repaint();
+                return;
+            }
+            if(ctrl && e.getKeyCode() == KeyEvent.VK_MINUS) {
+                if(canvas.PIXEL_SIZE > 1) {
+                    canvas.PIXEL_SIZE--;
+                }
+                canvas.repaint();
+                return;
+            }
+            if(ctrl && e.getKeyCode() == KeyEvent.VK_0) {
+                canvas.PIXEL_SIZE = 6;
+                    canvas.repaint();
+                return;
+            }
+        */
+
         switch (e.getKeyCode()) {
             case KeyEvent.VK_1:
                 canvas.currentElement = new Elements.Sand();
@@ -88,7 +111,7 @@ public class InputHandler implements MouseListener, MouseMotionListener, MouseWh
     public void mouseWheelMoved(MouseWheelEvent e) 
     {
         int delta = e.getWheelRotation();
-        canvas.brushSize = Math.max(1, Math.min(10, canvas.brushSize - delta));
+        canvas.brushSize = Math.max(1, Math.min(Renderer.MAX_BRUSH_SIZE, canvas.brushSize - delta));
         canvas.repaint();
     }
 

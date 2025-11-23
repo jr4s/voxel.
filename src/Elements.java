@@ -54,8 +54,8 @@ public class Elements
     {
         private static final Color[] COLORS =
         {
-            new Color(220, 180, 60),
-            new Color(230, 190, 80),
+            new Color(232, 198, 97),
+            new Color(235, 200, 98),
             new Color(240, 205, 100)
         };
 
@@ -74,33 +74,51 @@ public class Elements
         }
 
         @Override
-        public void update(int y, int x, Element[][] grid, Random rand)
-        {
+        public void update(int y, int x, Element[][] grid, Random rand) {
             int rows = grid.length;
             int cols = grid[0].length;
 
-            if (y + 1 < rows)
-            {
+            // Try straight down first
+            if (y + 1 < rows) {
                 Element below = grid[y + 1][x];
-                if (below instanceof Empty || below instanceof Water)
-                {
-                    move(grid, y, x, y + 1, x);
+
+                // Empty space directly below → fall straight down
+                if (below instanceof Empty) {
+                    ElementsUtil.move(grid, y, x, y + 1, x);
                     return;
+                }
+
+                // Water directly below → slow scatter effect
+                if (below instanceof Water) {
+                    // Add "drag": only move sometimes
+                    if (rand.nextInt(3) == 0) {
+                        // 1 in 3 chance to sink directly
+                        ElementsUtil.swap(grid, y, x, y + 1, x);
+                        return;
+                    } else {
+                        // Otherwise scatter sideways
+                        int dir = rand.nextBoolean() ? -1 : 1;
+                        int nx = x + dir;
+                        int ny = y + 1;
+
+                        if (nx >= 0 && nx < cols && ny < rows && grid[ny][nx] instanceof Empty) {
+                            ElementsUtil.move(grid, y, x, ny, nx); // drift diagonally
+                            return;
+                        }
+                    }
                 }
             }
 
-            if (rand.nextBoolean() || rand.nextInt(3) == 0) 
-            {
+            // Random diagonal movement (like natural sliding)
+            if (rand.nextBoolean() || rand.nextInt(3) == 0) {
                 int dir = rand.nextBoolean() ? -1 : 1;
                 int nx = x + dir;
                 int ny = y + 1;
 
-                if (nx >= 0 && nx < cols && ny < rows)
-                {
+                if (nx >= 0 && nx < cols && ny < rows) {
                     Element diag = grid[ny][nx];
-                    if (diag instanceof Empty || diag instanceof Water)
-                    {
-                        move(grid, y, x, ny, nx);
+                    if (diag instanceof Empty || diag instanceof Water) {
+                        ElementsUtil.move(grid, y, x, ny, nx);
                     }
                 }
             }
@@ -128,19 +146,38 @@ public class Elements
         public Color getColor() { return color; }
 
         @Override
-        public void update(int y, int x, Element[][] grid, Random rand)
-        {
+        public void update(int y, int x, Element[][] grid, Random rand) {
             int rows = grid.length;
             int cols = grid[0].length;
 
             // Try straight down first
-            if (y + 1 < rows)
-            {
+            if (y + 1 < rows) {
                 Element below = grid[y + 1][x];
-                if (below instanceof Empty)
-                {
-                    move(grid, y, x, y + 1, x);
+
+                // Empty space directly below → fall straight down
+                if (below instanceof Empty) {
+                    ElementsUtil.move(grid, y, x, y + 1, x);
                     return;
+                }
+
+                // Water directly below → slower scatter effect
+                if (below instanceof Water) {
+                    // Dirt is heavier, but less fluid than sand → only sometimes sink
+                    if (rand.nextInt(4) == 0) { 
+                        // 1 in 4 chance to sink directly
+                        ElementsUtil.swap(grid, y, x, y + 1, x);
+                        return;
+                    } else {
+                        // Otherwise try to scatter sideways
+                        int dir = rand.nextBoolean() ? -1 : 1;
+                        int nx = x + dir;
+                        int ny = y + 1;
+
+                        if (nx >= 0 && nx < cols && ny < rows && grid[ny][nx] instanceof Empty) {
+                            ElementsUtil.move(grid, y, x, ny, nx);
+                            return;
+                        }
+                    }
                 }
             }
 
@@ -149,15 +186,14 @@ public class Elements
             int nx = x + dir;
             int ny = y + 1;
 
-            if (nx >= 0 && nx < cols && ny < rows)
-            {
+            if (nx >= 0 && nx < cols && ny < rows) {
                 Element diag = grid[ny][nx];
-                if (diag instanceof Empty)
-                {
-                    move(grid, y, x, ny, nx);
+                if (diag instanceof Empty || diag instanceof Water) {
+                    ElementsUtil.move(grid, y, x, ny, nx);
                 }
             }
         }
+
     }
 
     public static class Water extends Element
@@ -193,7 +229,7 @@ public class Elements
 
             if (y + 1 < rows && grid[y + 1][x] instanceof Empty)
             {
-                move(grid, y, x, y + 1, x);
+                ElementsUtil.move(grid, y, x, y + 1, x);
                 return;
             }
 
@@ -204,14 +240,14 @@ public class Elements
             if (y + 1 < rows && x + dir >= 0 && x + dir < cols &&
                 grid[y + 1][x + dir] instanceof Empty)
             {
-                move(grid, y, x, y + 1, x + dir);
+                ElementsUtil.move(grid, y, x, y + 1, x + dir);
                 return;
             }
 
             if (x + dir >= 0 && x + dir < cols &&
                 grid[y][x + dir] instanceof Empty)
             {
-                move(grid, y, x, y, x + dir);
+                ElementsUtil.move(grid, y, x, y, x + dir);
                 return;
             }
 
@@ -219,14 +255,8 @@ public class Elements
             if (x + opposite >= 0 && x + opposite < cols &&
                 grid[y][x + opposite] instanceof Empty)
             {
-                move(grid, y, x, y, x + opposite);
+                ElementsUtil.move(grid, y, x, y, x + opposite);
             }
         }
-    }
-
-    static void move(Element[][] grid, int fromY, int fromX, int toY, int toX)
-    {
-        grid[toY][toX] = grid[fromY][fromX];
-        grid[fromY][fromX] = new Elements.Empty();
     }
 }
