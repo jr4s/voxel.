@@ -12,7 +12,7 @@ Thumbs.db
 *.log
 *.tmp
 
-# Compiled class files
+# Compiled class files (if ever outside target)
 /bin/
 /*.class
 
