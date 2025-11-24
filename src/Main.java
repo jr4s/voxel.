@@ -1,4 +1,5 @@
 import javax.swing.*;
+import renderer.Renderer;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -8,7 +9,7 @@ public class Main {
     private static JFrame frame;
 
     public static void main(String[] args) {
-        frame = new JFrame("JVoxels - OpenJDK");
+        frame = new JFrame("Boxel - OpenJDK");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(true);
 
@@ -16,14 +17,15 @@ public class Main {
         frame.setIconImage(ico.getImage());
         
         Renderer canvas = new Renderer();
+        // canvas.LoadMap("res/maps/map.txt"); 
+
         frame.add(canvas);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        canvas.gameInit();
+        canvas.gameInit(); // Start the game loop
 
-        // Add key binding for F11
         canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"), "toggleFullscreen");
         canvas.getActionMap().put("toggleFullscreen", new AbstractAction() {
             @Override
@@ -35,7 +37,7 @@ public class Main {
 
     private static void toggleFullscreen() {
         if (!isFullscreen) {
-            frame.dispose(); // required before undecorated change
+            frame.dispose();
             frame.setUndecorated(true);
             gd.setFullScreenWindow(frame);
             isFullscreen = true;
