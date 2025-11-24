@@ -14,7 +14,7 @@ import utils.LoadMap;
 
 public class Renderer extends JPanel implements Runnable 
 {
-    public int PIXEL_SIZE = 6;
+    public int PIXEL_SIZE = 8;
     public int GRID_COLS, GRID_ROWS;
     public Elements.Element[][] grid;
 
@@ -169,8 +169,23 @@ public class Renderer extends JPanel implements Runnable
 
             // Cursor circle
             int diameter = brushSize * PIXEL_SIZE;
+
+            // Pick a color from the element's palette
+            Color[] palette = currentElement.getPalette();
+            Color fillColor = palette[(int)(Math.random() * palette.length)];
+
+            // Fill the oval with the element color
+            g.setColor(fillColor);
+            g.fillOval(
+                cx * PIXEL_SIZE - diameter / 2, 
+                cy * PIXEL_SIZE - diameter / 2, 
+                diameter, 
+                diameter
+            );
+
+            // Draw white outline
             g.setColor(Color.WHITE);
-            g.drawRect(
+            g.drawOval(
                 cx * PIXEL_SIZE - diameter / 2, 
                 cy * PIXEL_SIZE - diameter / 2, 
                 diameter, 

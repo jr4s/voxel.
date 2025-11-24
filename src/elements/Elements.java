@@ -31,6 +31,10 @@ public class Elements
             Color c = getColor();
             return new int[]{c.getRed(), c.getGreen(), c.getBlue()};
         }
+
+        public Color[] getPalette() {
+        return new Color[]{ getColor() };
+        }
     }
 
     // Stone 
@@ -110,6 +114,11 @@ public class Elements
         @Override
         public Color getColor() { return color; }
 
+        public Color[] getPallete()
+        {
+            return COLORS;
+        }
+
         @Override
         public void update(int y, int x, Element[][] grid, Random rand) 
         {
@@ -177,6 +186,12 @@ public class Elements
         @Override
         public Color getColor() { return color; }
 
+        
+        public Color[] getPallete()
+        {
+            return COLORS;
+        }
+
         @Override
         public void update(int y, int x, Element[][] grid, Random rand) 
         {
@@ -223,6 +238,11 @@ public class Elements
         public Color getColor() {
             int index = rand.nextInt(COLORS.length);
             return COLORS[index];
+        }
+
+        public Color[] getPallete()
+        {
+            return COLORS;
         }
 
         @Override
@@ -278,6 +298,12 @@ public class Elements
             this.name = "Lava";
         }
 
+        
+        public Color[] getPallete()
+        {
+            return COLORS;
+        }
+
         @Override
         public void update(int y, int x, Element[][] grid, Random rand) {
             // Slow down lava falling
@@ -301,7 +327,7 @@ public class Elements
 
             // Update color every few ticks
             tickCounter++;
-            if (tickCounter % 15 == 0) { 
+            if (tickCounter % 8 == 0) { 
                 currentColorIndex = (currentColorIndex + 1) % COLORS.length;
             }
         }

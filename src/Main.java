@@ -11,6 +11,7 @@ public class Main {
     public static void main(String[] args) {
         frame = new JFrame("Boxel - OpenJDK");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         frame.setResizable(true);
 
         ImageIcon ico = new ImageIcon("res/assets/icon.png");
@@ -24,7 +25,7 @@ public class Main {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
 
-        canvas.gameInit(); // Start the game loop
+        canvas.gameInit(); 
 
         canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F11"), "toggleFullscreen");
         canvas.getActionMap().put("toggleFullscreen", new AbstractAction() {
@@ -33,6 +34,16 @@ public class Main {
                 toggleFullscreen();
             }
         });
+
+            AbstractAction escAction = new AbstractAction() {            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        };
+        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
+              .put(KeyStroke.getKeyStroke("ESCAPE"), "ESCAPE");
+        canvas.getActionMap().put("ESCAPE", escAction);
     }
 
     private static void toggleFullscreen() {
