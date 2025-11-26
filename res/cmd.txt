@@ -1,4 +1,0 @@
-## Use this following commands to build & run the project:
-
-mvn clean package
-java -jar target/PX-JAVAC-1.0-SNAPSHOT.jar or mvn exec:java

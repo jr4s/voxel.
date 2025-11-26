@@ -1,0 +1,2 @@
+mvn clean compile        # Compiles your code
+mvn exec:java            # Runs the main class defined in pom.xml

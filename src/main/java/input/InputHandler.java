@@ -2,21 +2,25 @@ package input;
 
 import java.awt.event.*;
 
-import elements.Elements;
-import elements.ElementsBehavior;
-import renderer.Renderer;
+import elements.Core;
+import elements.Energy;
+import elements.Fluids;
+import elements.Solids;
+import elements.Terrain;
+
+import renderer.Cellular;
 
 public class InputHandler 
 {
-    private final Renderer canvas;
+    private final Cellular canvas;
 
-    private InputHandler(Renderer canvas) 
+    private InputHandler(Cellular canvas) 
     {
         this.canvas = canvas;
         registerListener();
     }
 
-    public static InputHandler createAndRegister(Renderer canvas) 
+    public static InputHandler createAndRegister(Cellular canvas) 
     {
         return new InputHandler(canvas);
     }
@@ -51,7 +55,7 @@ public class InputHandler
 
         canvas.addMouseWheelListener(e -> {
             int delta = e.getWheelRotation();
-            canvas.brushSize = Math.max(1, Math.min(Renderer.MAX_BRUSH_SIZE, canvas.brushSize - delta));
+            canvas.brushSize = Math.max(1, Math.min(Cellular.MAX_BRUSH_SIZE, canvas.brushSize - delta));
             refresh();
         });
 
@@ -62,14 +66,14 @@ public class InputHandler
     private void handleKeyPress(KeyEvent e) 
     {
         switch (e.getKeyCode()) {
-            case KeyEvent.VK_1 -> canvas.currentElement = new Elements.Sand();
-            case KeyEvent.VK_2 -> canvas.currentElement = new Elements.Water();
-            case KeyEvent.VK_3 -> canvas.currentElement = new Elements.Wood();
-            case KeyEvent.VK_4 -> canvas.currentElement = new ElementsBehavior.Fire();
-            case KeyEvent.VK_5 -> canvas.currentElement = new Elements.Empty();
-            case KeyEvent.VK_6 -> canvas.currentElement = new Elements.Lava();
-            case KeyEvent.VK_7 -> canvas.currentElement = new Elements.Stone();
-            case KeyEvent.VK_DELETE -> clearGrid();
+            case KeyEvent.VK_1 -> canvas.currentElement = new Terrain.Sand();
+            case KeyEvent.VK_2 -> canvas.currentElement = new Fluids.Water();
+            case KeyEvent.VK_3 -> canvas.currentElement = new Solids.Wood();
+            case KeyEvent.VK_4 -> canvas.currentElement = new Energy.Fire();
+            case KeyEvent.VK_6 -> canvas.currentElement = new Fluids.Lava();
+            case KeyEvent.VK_7 -> canvas.currentElement = new Solids.Stone();
+            case KeyEvent.VK_8 -> canvas.currentElement = new Fluids.Oil();
+            case KeyEvent.VK_C -> clearGrid();
         }
     }
 
@@ -78,7 +82,7 @@ public class InputHandler
         if (canvas.grid != null) {
             for (int y = 0; y < canvas.GRID_ROWS; y++) {
                 for (int x = 0; x < canvas.GRID_COLS; x++) {
-                    canvas.grid[y][x] = new Elements.Empty();
+                    canvas.grid[y][x] = new Core.Empty();
                 }
             }
         }

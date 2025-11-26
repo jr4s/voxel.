@@ -3,24 +3,25 @@ package renderer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.Random;
 
-import elements.Elements;
+import elements.Core;
+import elements.Terrain;
 import input.InputHandler;
 import utils.FontManager;
-import utils.LoadMap;
 
-public class Renderer extends JPanel implements Runnable 
+public class Cellular extends JPanel implements Runnable 
 {
-    public int PIXEL_SIZE = 8;
+    public int PIXEL_SIZE = 5;
     public int GRID_COLS, GRID_ROWS;
-    public Elements.Element[][] grid;
+    public Core.Element[][] grid;
 
     public static final int MAX_BRUSH_SIZE = 20;
     public int brushSize = 1;
-    public Elements.Element currentElement = new Elements.Sand();
+    public Core.Element currentElement = new Terrain.Sand();
 
     private final Random rand = new Random();
     public boolean mouseDown = false;
@@ -39,12 +40,12 @@ public class Renderer extends JPanel implements Runnable
 
     Font gameFont;
 
-    public Renderer() 
+    public Cellular() 
     {
         setBackground(Color.BLACK);
         setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
 
-        gameFont = FontManager.load("res/fonts/ByteBounce.ttf", 25);
+        gameFont = FontManager.load("/fonts/ByteBounce.ttf", 25);
 
         Cursor invisibleCursor = Toolkit.getDefaultToolkit().createCustomCursor(
                 new BufferedImage(1,1,BufferedImage.TYPE_INT_ARGB), new Point(), "invis");
@@ -74,13 +75,13 @@ public class Renderer extends JPanel implements Runnable
         int newCols = Math.max(1, getWidth() / PIXEL_SIZE);
         int newRows = Math.max(1, getHeight() / PIXEL_SIZE);
 
-        Elements.Element[][] newGrid = new Elements.Element[newRows][newCols];
+        Core.Element[][] newGrid = new Core.Element[newRows][newCols];
         for (int y = 0; y < newRows; y++) {
             for (int x = 0; x < newCols; x++) {
                 if (grid != null && y < grid.length && x < grid[0].length)
                     newGrid[y][x] = grid[y][x];
                 else
-                    newGrid[y][x] = new Elements.Empty();
+                    newGrid[y][x] = new Core.Empty();
             }
         }
 
@@ -94,7 +95,7 @@ public class Renderer extends JPanel implements Runnable
         drawnPixels = 0; // reset counter
         for (int y = 0; y < GRID_ROWS; y++) {
             for (int x = 0; x < GRID_COLS; x++) {
-                if (!(grid[y][x] instanceof Elements.Empty)) drawnPixels++;
+                if (!(grid[y][x] instanceof Core.Empty)) drawnPixels++;
             }
         }
     }
@@ -144,12 +145,12 @@ public class Renderer extends JPanel implements Runnable
             }
         }
 
-        // Update BufferedImage and drawnPixels
+
         drawnPixels = 0;
         for (int y = 0; y < GRID_ROWS; y++) {
             for (int x = 0; x < GRID_COLS; x++) {
                 raster.setPixel(x, y, grid[y][x].getRGBArray());
-                if (!(grid[y][x] instanceof Elements.Empty)) drawnPixels++;
+                if (!(grid[y][x] instanceof Core.Empty)) drawnPixels++;
             }
         }
     }   
@@ -223,23 +224,13 @@ public class Renderer extends JPanel implements Runnable
                 int x = cx + dx;
                 int y = cy + dy;
                 if (x >= 0 && x < GRID_COLS && y >= 0 && y < GRID_ROWS) {
-                    if (grid[y][x] instanceof Elements.Empty && !currentElement.isEmpty()) drawnPixels++;
+                    if (grid[y][x] instanceof Core.Empty && !currentElement.isEmpty()) drawnPixels++;
                     grid[y][x] = currentElement.create();
                 }
             }
         }
     }
 
-
-public void LoadMap(String path)
-    {
-        Elements.Element[][] loadedGrid = LoadMap.fromFile(path);
-        if(loadedGrid != null) {
-            this.grid = loadedGrid;
-            this.GRID_COLS = loadedGrid.length;
-            this.GRID_ROWS = loadedGrid[0].length;
-        }
-    }
 
     public int countDrawnPixels() {
         return drawnPixels;
@@ -254,7 +245,7 @@ public void LoadMap(String path)
                 int x = cx + dx;
                 int y = cy + dy;
                 if (x >= 0 && x < GRID_COLS && y >= 0 && y < GRID_ROWS) {
-                    if (!(grid[y][x] instanceof Elements.Empty)) count++;
+                    if (!(grid[y][x] instanceof Core.Empty)) count++;
                 }
             }
         }
