@@ -1,24 +1,10 @@
-## SandJVK - Java Version
-A falling sand simulation written in **Java** using **Swing**.  
-It includes sand and water physics, a paintable grid, and keyboard/mouse controls.
+## Sand : Voxels - Java Version
 
-### Overview
-  
-- Adjustable **brush size**.
-- Mouse inputs and Keyboard controls for spawning and clearing elements.
-
-## Controls
-| Key / Mouse | Action |
-|--------------|---------|
-| `1` | Select Sand |
-| `2` | Select Water |
-| `3` | Select Water |
-| `4` | Select Eraser (Empty) |
-| `C` | Clear the whole screen |
-| Mouse Click / Drag | Place current element |
-| Mouse Wheel | Change brush size |
+A CPU-based falling sand simulation written in Java.
 
 
 
+### Note:
+This project is being migrated to C++/OpenGL for GPU-based simulation using fragment shaders.
 
-  
+
